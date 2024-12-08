@@ -6,15 +6,18 @@ import {
   TransitionChild,
 } from "@headlessui/react";
 import {
-  ShoppingBagIcon,
+  BriefcaseIcon,
   Squares2X2Icon,
   UserGroupIcon,
+  UserIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { Fragment, useState } from "react";
 import Layout from "./Layout";
 
+import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
+import { RootState } from "../../../redux/store";
 
 interface AdminProps {
   children: JSX.Element | JSX.Element[];
@@ -22,6 +25,7 @@ interface AdminProps {
 
 const AdminLayout = ({ children }: AdminProps) => {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const { user } = useSelector((state: RootState) => state.userReducer);
   return (
     <Layout>
       <div className="bg-white">
@@ -65,44 +69,62 @@ const AdminLayout = ({ children }: AdminProps) => {
                         <span className="sr-only">Close menu</span>
                         <XMarkIcon className="h-6 w-6" aria-hidden="true" />
                       </button>
-                      <h2 className=" text-center text-xl font-bold leading-9 tracking-tight text-gray-900">
-                        Admin Dashboard
-                      </h2>
                     </div>
 
                     <div className="space-y-6 border-t border-gray-200 px-4 py-6">
-                      <div className="flex items-center space-x-1">
-                        <ShoppingBagIcon
-                          className="h-4 w-4 text-gray-900"
-                          aria-hidden="true"
-                        />
-                        <NavLink
-                          to="/admin/job"
-                          className={({ isActive }) =>
-                            isActive
-                              ? "-m-2 block p-2 font-medium text-sm text-blue-600 "
-                              : "-m-2 block p-2 font-medium text-sm text-gray-900"
-                          }
-                        >
-                          Job
-                        </NavLink>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <UserGroupIcon
-                          className="h-4 w-4 text-gray-900"
-                          aria-hidden="true"
-                        />
-                        <NavLink
-                          to="/admin/user"
-                          className={({ isActive }) =>
-                            isActive
-                              ? "-m-2 block p-2 font-medium text-sm text-blue-600 "
-                              : "-m-2 block p-2 font-medium text-sm text-gray-900"
-                          }
-                        >
-                          User
-                        </NavLink>
-                      </div>
+                      {user?.role === "admin" ? (
+                        <>
+                          <div className="flex items-center space-x-1">
+                            <NavLink
+                              to="/admin/user"
+                              className={({ isActive }) =>
+                                isActive
+                                  ? "bg-blue-100 flex gap-4 items-center p-4 rounded-lg justify-start text-blue-600 w-full"
+                                  : "flex gap-4 items-center p-4 rounded-lg justify-start w-full"
+                              }
+                            >
+                              <UserIcon
+                                className="h-4 w-4 text-gray-900"
+                                aria-hidden="true"
+                              />
+                              User
+                            </NavLink>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <NavLink
+                              to="/admin/job"
+                              className={({ isActive }) =>
+                                isActive
+                                  ? "bg-blue-100 flex gap-4 items-center p-4 rounded-lg justify-start text-blue-600 w-full"
+                                  : "flex gap-4 items-center p-4 rounded-lg justify-start w-full"
+                              }
+                            >
+                              <BriefcaseIcon
+                                className="h-4 w-4 text-gray-900"
+                                aria-hidden="true"
+                              />
+                              Job
+                            </NavLink>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex items-center space-x-1">
+                          <NavLink
+                            to="/admin/applications"
+                            className={({ isActive }) =>
+                              isActive
+                                ? "bg-blue-100 flex gap-4 items-center p-4 rounded-lg justify-start text-blue-600 w-full"
+                                : "flex gap-4 items-center p-4 rounded-lg justify-start w-full"
+                            }
+                          >
+                            <UserGroupIcon
+                              className="h-4 w-4 text-gray-900"
+                              aria-hidden="true"
+                            />
+                            Applicants
+                          </NavLink>
+                        </div>
+                      )}
                     </div>
                   </DialogPanel>
                 </TransitionChild>
@@ -138,42 +160,29 @@ const AdminLayout = ({ children }: AdminProps) => {
 
             <section aria-labelledby="products-heading" className="p-2 ">
               <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4 ">
-                <div className="space-y-6  px-4 py-1 hidden lg:block">
-                  <h2 className=" text-xl font-bold leading-9 tracking-tight text-gray-900">
-                    Admin Dashboard
-                  </h2>
-                  <div className="flex items-center space-x-1">
-                    <ShoppingBagIcon
-                      className="h-4 w-4 text-gray-900"
-                      aria-hidden="true"
+                <div className="space-y-6 py-1 hidden lg:block px-1">
+                  {user?.role === "admin" ? (
+                    <>
+                      <SideLink
+                        link="/admin/user"
+                        label="User"
+                        icon={<UserIcon className="h-6 w-6 text-gray-900" />}
+                      />
+                      <SideLink
+                        link="/admin/job"
+                        label="Job"
+                        icon={
+                          <BriefcaseIcon className="h-6 w-6 text-gray-900" />
+                        }
+                      />
+                    </>
+                  ) : (
+                    <SideLink
+                      link="/admin/applications"
+                      label="Applicants"
+                      icon={<UserGroupIcon className="h-6 w-6 text-gray-900" />}
                     />
-                    <NavLink
-                      to="/admin/job"
-                      className={({ isActive }) =>
-                        isActive
-                          ? "-m-2 block p-2 font-medium text-sm text-blue-600 "
-                          : "-m-2 block p-2 font-medium text-sm text-gray-900"
-                      }
-                    >
-                      Job
-                    </NavLink>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <UserGroupIcon
-                      className="h-4 w-4 text-gray-900"
-                      aria-hidden="true"
-                    />
-                    <NavLink
-                      to="/admin/user"
-                      className={({ isActive }) =>
-                        isActive
-                          ? "-m-2 block p-2 font-medium text-sm text-blue-600 "
-                          : "-m-2 block p-2 font-medium text-sm text-gray-900"
-                      }
-                    >
-                      User
-                    </NavLink>
-                  </div>
+                  )}
                 </div>
 
                 <div className="lg:col-span-3">{children}</div>
@@ -187,3 +196,19 @@ const AdminLayout = ({ children }: AdminProps) => {
 };
 
 export default AdminLayout;
+
+const SideLink = ({ link, label, icon }: any) => {
+  return (
+    <NavLink
+      to={link}
+      className={({ isActive }) =>
+        isActive
+          ? "bg-blue-100 flex gap-4 items-center p-4 rounded-lg justify-start text-blue-600"
+          : "flex gap-4 items-center p-4 rounded-lg justify-start"
+      }
+    >
+      {icon}
+      <p className="text-lg font-semibold max-lg:hidden">{label}</p>
+    </NavLink>
+  );
+};

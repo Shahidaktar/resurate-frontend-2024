@@ -22,11 +22,19 @@ export const jobAPI = createApi({
       providesTags: ["job"],
     }),
 
+    recruiterJobs: builder.query<AllJobsResponse, string>({
+      query: (id) => `recruiter-jobs?id=${id}`,
+      providesTags: ["job"],
+    }),
+
     searchJobs: builder.query<searchJobsResponse, searchJobsRequest>({
-      query: ({ search, page, jobType, location }) => {
+      query: ({ search, page, jobType, location, experience, status, pay }) => {
         let base = `all?search=${search}&page=${page}`;
         if (jobType) base += `&jobType=${jobType}`;
         if (location) base += `&location=${location}`;
+        if (experience) base += `&experience=${experience}`;
+        if (status) base += `&status=${status}`;
+        if (pay) base += `&pay=${pay}`;
 
         return base;
       },
@@ -69,4 +77,5 @@ export const {
   useNewJobMutation,
   useUpdateJobMutation,
   useDeleteJobMutation,
+  useRecruiterJobsQuery,
 } = jobAPI;

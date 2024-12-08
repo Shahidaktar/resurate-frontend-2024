@@ -2,8 +2,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import AdminLayout from "../../components/shared/Layout/AdminLayout";
 
 import { FormEvent, useState } from "react";
-import { useUpdateApplyMutation } from "../../redux/api/ApplyAPI";
 import { useSelector } from "react-redux";
+import { useUpdateApplyMutation } from "../../redux/api/ApplyAPI";
 import { RootState } from "../../redux/store";
 import { responseToast } from "../../utils/features";
 
@@ -22,7 +22,7 @@ const Apply = () => {
     };
     const res = await updateApply({ user: user?._id, data });
 
-    responseToast(res, navigate, "/admin/job");
+    responseToast(res, navigate, "/admin/applications");
   };
 
   return (

@@ -28,10 +28,9 @@ export type Job = {
   jobSummary: string;
   responsibities: string;
   skils: string;
-  eligbilty: string;
-  startDate: Date;
-  endDate: Date;
+  status: string;
   _id: string;
+  user: User;
 };
 
 export type JobData = {
@@ -45,9 +44,7 @@ export type JobData = {
   jobSummary: string;
   responsibities: string;
   skils: string;
-  eligbilty: string;
-  startDate: string;
-  endDate: string;
+  status: string;
 };
 
 export type Apply = {
@@ -63,4 +60,24 @@ export type NewApplyforAll = {
   job: string;
   score?: number;
   status?: string;
+};
+
+export type Post = {
+  _id: string;
+  content: string;
+  image: {
+    public_id: string;
+    url: string;
+  };
+  user: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type FavoriteJob = {
+  _id: string;
+  name: string;
+  company: string;
+  location: string;
+  jobSummary: string;
 };

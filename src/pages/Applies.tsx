@@ -1,102 +1,119 @@
-import Layout from "../components/shared/Layout/Layout";
-import { useState } from "react";
-import { Skeleton } from "../components/Loader";
-import { RootState } from "../redux/store";
-import { useSelector } from "react-redux";
-import { useApplyDetailsQuery } from "../redux/api/ApplyAPI";
-import { CustomError } from "../types/api-types";
+import {
+  BriefcaseIcon,
+  BuildingOfficeIcon,
+  CalendarIcon,
+  MapPinIcon,
+} from "@heroicons/react/24/outline";
+import { format } from "date-fns";
 import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import Layout from "../components/shared/Layout/Layout";
+import { useApplyDetailsQuery } from "../redux/api/ApplyAPI";
+import { RootState } from "../redux/store";
+import { CustomError } from "../types/api-types";
 
 const Applies = () => {
   const { user } = useSelector((state: RootState) => state.userReducer);
   const { data, isLoading, isError, error } = useApplyDetailsQuery(user?._id!);
-  const [page, setPage] = useState(1);
-  const isPrevPage = page > 1;
-  const isNextPage = page < 4;
+
   if (isError) {
     const err = error as CustomError;
     toast.error(err.data.message);
   }
+
   return (
     <Layout>
-      {isLoading ? (
-        <Skeleton />
-      ) : (
-        <div className="lg:w-2/3 w-full mx-auto space-y-3 overflow-x-scroll scrollbar-hide">
-          <h1 className=" p-3 w-full overflow-hidden rounded-md text-gray-700 text-2xl lg:aspect-none group-hover:opacity-75 flex justify-center ">
+      <div className="py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-2xl font-bold text-gray-900 mb-8 text-center">
             My Applications
           </h1>
-          <table className="table-auto w-full text-left whitespace-no-wrap">
-            <thead>
-              <tr>
-                <th className="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100 ">
-                  Company Name
-                </th>
-                <th className="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100">
-                  Job Role
-                </th>
-                <th className="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100 ">
-                  Job Type
-                </th>
-                <th className="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100">
-                  Location
-                </th>
-                <th className="px-4 py-3 title-font tracking-wider font-medium text-gray-900 text-sm bg-gray-100">
-                  Status
-                </th>
-              </tr>
-            </thead>
 
-            <tbody>
-              {data?.data.map((order) => (
-                <tr key={order.job._id}>
-                  <td className="px-4 py-1">{order.job.company}</td>
-                  <td className="px-4 py-1">{order.job.name}</td>
-                  <td className="px-4 py-1">{order.job.jobType}</td>
-                  <td className="px-4 py-1">{order.job.location}</td>
-                  <td className="px-4 py-1">
-                    <span
-                      className={
-                        order.status === "Pending"
-                          ? "text-violet-700"
-                          : order.status === "Selected"
-                          ? "text-green-600"
-                          : "text-red-600"
-                      }
-                    >
-                      {order.status}
-                    </span>
-                  </td>
-                </tr>
+          {isLoading ? (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {[...Array(6)].map((_, index) => (
+                <div
+                  key={index}
+                  className="animate-pulse bg-white rounded-xl p-6 shadow-sm"
+                >
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                </div>
               ))}
-            </tbody>
-          </table>
-
-          {data?.data.length! > 6 && (
-            <div>
-              <article className="flex justify-center space-x-3 items-center">
-                <button
-                  className="bg-red-600 text-white px-2 py-1 rounded-lg disabled:bg-red-400"
-                  onClick={() => setPage((prev) => prev - 1)}
-                  disabled={!isPrevPage}
-                >
-                  Prev
-                </button>
-                <span className="text-sm text-gray-700 font-sans ">
-                  {page} of {4}
-                </span>
-                <button
-                  className="bg-red-600 text-white px-2 py-1 rounded-lg disabled:bg-red-400"
-                  onClick={() => setPage((prev) => prev + 1)}
-                  disabled={!isNextPage}
-                >
-                  Next
-                </button>
-              </article>
             </div>
+          ) : data?.data.length === 0 ? (
+            <div className="text-center py-12">
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No applications yet
+              </h3>
+              <p className="text-gray-500">
+                Start exploring and applying for jobs!
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {data?.data.map((application) => (
+                  <div
+                    key={application.job?._id}
+                    className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden border border-gray-100"
+                  >
+                    <div className="p-6">
+                      <div className="flex justify-end mb-4">
+                        <span
+                          className={`px-3 py-1 text-xs font-medium rounded-full ${
+                            application.status === "Pending"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : application.status === "Selected"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {application.status}
+                        </span>
+                      </div>
+                      <h2 className="text-lg font-semibold text-gray-900 mb-4 line-clamp-1">
+                        {application.job?.name || "N/A"}
+                      </h2>
+
+                      <div className="space-y-3 text-sm">
+                        <div className="flex items-center text-gray-600">
+                          <BuildingOfficeIcon className="h-5 w-5 mr-2" />
+                          <span>{application.job?.company || "N/A"}</span>
+                        </div>
+                        <div className="flex items-center text-gray-600">
+                          <MapPinIcon className="h-5 w-5 mr-2" />
+                          <span>{application.job?.location || "N/A"}</span>
+                        </div>
+                        <div className="flex items-center text-gray-600">
+                          <BriefcaseIcon className="h-5 w-5 mr-2" />
+                          <span>{application.job?.jobType || "N/A"}</span>
+                        </div>
+                        <div className="flex items-center text-gray-600">
+                          <CalendarIcon className="h-5 w-5 mr-2" />
+                          <span>
+                            Applied on {format(new Date(), "MMM dd, yyyy")}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+                      <Link to={`/job/${application.job?._id}`}>
+                        <button className="w-full px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 focus:outline-none">
+                          View Application
+                        </button>
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
-      )}
+      </div>
     </Layout>
   );
 };

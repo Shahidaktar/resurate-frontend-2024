@@ -1,20 +1,27 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { onAuthStateChanged } from "firebase/auth";
 import { lazy, Suspense, useEffect } from "react";
 import { Toaster } from "react-hot-toast";
-import Loader from "./components/Loader";
-import { UserReducerInitialState } from "./types/reducer-types";
 import { useDispatch, useSelector } from "react-redux";
-import { onAuthStateChanged } from "firebase/auth";
-import { getUser } from "./redux/api/userAPI";
-import { auth } from "./firebase";
-import { userExist, userNotExist } from "./redux/reducer/userReducer";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import Loader from "./components/Loader";
 import ProtectedRoute from "./components/protectedRoute";
+import Footer from "./components/shared/Layout/Footer";
+import { auth } from "./firebase";
+import { getUser } from "./redux/api/userAPI";
+import { userExist, userNotExist } from "./redux/reducer/userReducer";
+import { UserReducerInitialState } from "./types/reducer-types";
 
 const Home = lazy(() => import("./pages/Home"));
+const Landing = lazy(() => import("./pages/Landing"));
 const JobDetails = lazy(() => import("./pages/JobDetails"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Login = lazy(() => import("./pages/Login"));
 const UploadResume = lazy(() => import("./pages/UploadResume"));
+const Favorite = lazy(() => import("./pages/Favorite"));
+const CareerAdvice = lazy(() => import("./pages/CareerAdvice"));
+const ResumeTips = lazy(() => import("./pages/ResumeTips"));
+const InterviewGuide = lazy(() => import("./pages/InterviewGuide"));
+const SalaryCalculator = lazy(() => import("./pages/SalaryCalculator"));
 
 const Job = lazy(() => import("./pages/admin/Job"));
 const User = lazy(() => import("./pages/admin/User"));
@@ -22,8 +29,9 @@ const Apply = lazy(() => import("./pages/admin/Apply"));
 const AddJob = lazy(() => import("./pages/admin/AddJob"));
 const ManageJob = lazy(() => import("./pages/admin/ManageJob"));
 const JobApplicants = lazy(() => import("./pages/admin/JobApplicants"));
+const Applicant = lazy(() => import("./pages/admin/Applicant"));
 const Applies = lazy(() => import("./pages/Applies"));
-const JobApply = lazy(() => import("./pages/JobApply"));
+const Posts = lazy(() => import("./pages/Posts"));
 
 const App = () => {
   const { user } = useSelector(
@@ -45,8 +53,10 @@ const App = () => {
     <Router>
       <Suspense fallback={<Loader />}>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Landing />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/job/:id" element={<JobDetails />} />
+          <Route path="/posts" element={<Posts />} />
           <Route
             path="/login"
             element={
@@ -62,7 +72,11 @@ const App = () => {
               <ProtectedRoute
                 isAuthenticated={true}
                 adminOnly={true}
-                admin={user?.role === "admin" ? true : false}
+                admin={
+                  user?.role === "admin" || user?.role === "recruiter"
+                    ? true
+                    : false
+                }
               />
             }
           >
@@ -73,7 +87,7 @@ const App = () => {
               path="/admin/job/applications/:id"
               element={<JobApplicants />}
             />
-
+            <Route path="/admin/applications" element={<Applicant />} />
             <Route path="/admin/user" element={<User />} />
             <Route
               path="/admin/job/applications/status/:id"
@@ -85,12 +99,19 @@ const App = () => {
           <Route
             element={<ProtectedRoute isAuthenticated={user ? true : false} />}
           >
+            <Route path="/favorite" element={<Favorite />} />
             <Route path="/applies" element={<Applies />} />
-            <Route path="/job-apply/:id" element={<JobApply />} />
             <Route path="/upload-resume" element={<UploadResume />} />
           </Route>
+
+          <Route path="/career-advice" element={<CareerAdvice />} />
+          <Route path="/resume-tips" element={<ResumeTips />} />
+          <Route path="/interview-guide" element={<InterviewGuide />} />
+          <Route path="/salary-calculator" element={<SalaryCalculator />} />
+
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <Footer />
       </Suspense>
       <Toaster position="bottom-center" />
     </Router>

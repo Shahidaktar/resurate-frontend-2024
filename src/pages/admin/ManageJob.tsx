@@ -1,18 +1,19 @@
 import { FormEvent, useEffect, useState } from "react";
-import AdminLayout from "../../components/shared/Layout/AdminLayout";
 import InputType from "../../components/shared/InputType";
+import AdminLayout from "../../components/shared/Layout/AdminLayout";
 
-import { ArchiveBoxIcon } from "@heroicons/react/24/outline";
+import { TrashIcon } from "@heroicons/react/24/outline";
 import { useSelector } from "react-redux";
 
+import MDEditor from "@uiw/react-md-editor";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
-import { RootState } from "../../redux/store";
-import { Skeleton } from "../../components/Loader";
+import { Skeleton1 } from "../../components/Loader";
 import {
   useDeleteJobMutation,
   useJobDetailsQuery,
   useUpdateJobMutation,
 } from "../../redux/api/jobAPI";
+import { RootState } from "../../redux/store";
 import { responseToast } from "../../utils/features";
 
 const ManageJob = () => {
@@ -34,9 +35,7 @@ const ManageJob = () => {
     jobSummary,
     responsibities,
     skils,
-    eligbilty,
-    startDate,
-    endDate,
+    status,
     openings,
     location,
   } = productDetailsResponse?.data || {
@@ -47,17 +46,14 @@ const ManageJob = () => {
     jobSummary: "",
     responsibities: "",
     skils: "",
-    eligbilty: "",
-    startDate: "",
-    endDate: "",
-    pay: 0,
+    status: "",
+    pay: "",
     openings: 0,
     experience: "",
   };
-
   const [nameUpdate, setNameUpdate] = useState<string>(name);
   const [companyUpdate, setCompanyUpdate] = useState<string>(company);
-  const [payUpdate, setPayUpdate] = useState<number>(Number(pay));
+  const [payUpdate, setPayUpdate] = useState<string>(pay);
   const [experienceUpdate, setExperienceUpdate] = useState<string>(experience);
   const [jobTypeUpdate, setJobTypeUpdate] = useState<string>(jobType);
   const [locationUpdate, setLocationUpdate] = useState<string>(location);
@@ -65,13 +61,7 @@ const ManageJob = () => {
   const [responsibitiesUpdate, setResponsibitiesUpdate] =
     useState<string>(responsibities);
   const [skilsUpdate, setSkilsUpdate] = useState<string>(skils);
-  const [eligbiltyUpdate, setEligbiltyUpdate] = useState<string>(eligbilty);
-  const [startDateUpdate, setStartDateUpdate] = useState<string>(
-    startDate.toString()
-  );
-  const [endDateUpdate, setEndDateUpdate] = useState<string>(
-    endDate.toString()
-  );
+  const [statusUpdate, setStatusUpdate] = useState<string>(status);
   const [openingsUpdate, setOpeningsUpdate] = useState<number>(
     Number(openings)
   );
@@ -88,10 +78,8 @@ const ManageJob = () => {
       experience: experienceUpdate,
       jobType: jobTypeUpdate,
       location: locationUpdate,
-      endDate: endDateUpdate,
-      startDate: startDateUpdate,
       responsibities: responsibitiesUpdate,
-      eligbilty: eligbiltyUpdate,
+      status: statusUpdate,
       jobSummary: jobSummaryUpdate,
       skils: skilsUpdate,
       pay: payUpdate.toString(),
@@ -102,7 +90,7 @@ const ManageJob = () => {
       JobData,
       jobId: productDetailsResponse?.data._id!,
     });
-    responseToast(res, navigate, "/admin/job");
+    responseToast(res, navigate, "/admin/applications");
   };
 
   const deleteHandler = async () => {
@@ -110,7 +98,7 @@ const ManageJob = () => {
       userId: user?._id!,
       jobId: productDetailsResponse?.data._id!,
     });
-    responseToast(res, navigate, "/admin/job");
+    responseToast(res, navigate, "/admin/applications");
   };
 
   useEffect(() => {
@@ -118,7 +106,7 @@ const ManageJob = () => {
       setNameUpdate(productDetailsResponse.data.name);
       setCompanyUpdate(productDetailsResponse.data.company);
       setExperienceUpdate(productDetailsResponse.data.experience);
-      setEligbiltyUpdate(productDetailsResponse.data.eligbilty);
+      setStatusUpdate(productDetailsResponse.data.status);
 
       setLocationUpdate(productDetailsResponse.data.location);
       setJobTypeUpdate(productDetailsResponse.data.jobType);
@@ -126,10 +114,8 @@ const ManageJob = () => {
       setSkilsUpdate(productDetailsResponse.data.skils);
 
       setResponsibitiesUpdate(productDetailsResponse.data.responsibities);
-      setPayUpdate(Number(productDetailsResponse.data.pay));
+      setPayUpdate(productDetailsResponse.data.pay);
       setOpeningsUpdate(productDetailsResponse.data.openings);
-      setStartDateUpdate(productDetailsResponse.data.startDate.toString());
-      setEndDateUpdate(productDetailsResponse.data.endDate.toString());
     }
   }, [productDetailsResponse]);
 
@@ -138,241 +124,211 @@ const ManageJob = () => {
   return (
     <AdminLayout>
       {isLoading ? (
-        <Skeleton />
+        <Skeleton1 />
       ) : (
-        <>
-          <button className="cursor-pointer" onClick={deleteHandler}>
-            <ArchiveBoxIcon
-              className="h-6 w-6 absolute right-[10%] top-[17%] text-red-600  hover:rotate-12 transition-all rounded-full"
-              aria-hidden="true"
-            />
-          </button>
+        <div className="min-h-screen bg-gray-50 py-8">
+          <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+            <div className="mb-8 flex justify-between">
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900">
+                  Manage Job Position
+                </h2>
+                <p className="mt-2 text-sm text-gray-600">
+                  Update the job details using the form below.
+                </p>
+              </div>
 
-          <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-2 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-              <h2 className="mt-2 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-                Manage
-              </h2>
+              <button
+                onClick={deleteHandler}
+                className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-sm font-medium text-red-700 "
+              >
+                <TrashIcon className="mr-1.5 h-4 w-4" />
+                Delete
+              </button>
             </div>
-
-            <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-              <form className="space-y-6" onSubmit={submitHandler}>
-                <InputType
-                  id="name"
-                  name="name"
-                  placeholder="name"
-                  type="text"
-                  value={nameUpdate}
-                  required
-                  autoComplete="autocomplete"
-                  label="name"
-                  labelFor="name"
-                  onChange={(e) => setNameUpdate(e.target.value)}
-                />
-                <InputType
-                  id="company"
-                  name="company"
-                  placeholder="company"
-                  type="text"
-                  value={companyUpdate}
-                  required
-                  autoComplete="autocomplete"
-                  label="company"
-                  labelFor="company"
-                  onChange={(e) => setCompanyUpdate(e.target.value)}
-                />
-                <InputType
-                  id="pay"
-                  name="pay"
-                  placeholder="pay"
-                  type="number"
-                  value={payUpdate}
-                  required
-                  autoComplete="autocomplete"
-                  label="pay"
-                  labelFor="pay"
-                  onChange={(e) => setPayUpdate(Number(e.target.value))}
-                />
-                <InputType
-                  id="openings"
-                  name="openings"
-                  placeholder="openings"
-                  type="number"
-                  value={openingsUpdate}
-                  required
-                  autoComplete="autocomplete"
-                  label="openings"
-                  labelFor="openings"
-                  onChange={(e) => setOpeningsUpdate(Number(e.target.value))}
-                />
-                <InputType
-                  id="experience"
-                  name="experience"
-                  placeholder="experience"
-                  type="text"
-                  value={experienceUpdate}
-                  required
-                  autoComplete="autocomplete"
-                  label="experience"
-                  labelFor="experience"
-                  onChange={(e) => setExperienceUpdate(e.target.value)}
-                />
-
-                <InputType
-                  id="jobType"
-                  name="jobType"
-                  placeholder="jobType"
-                  type="text"
-                  value={jobTypeUpdate}
-                  required
-                  autoComplete="autocomplete"
-                  label="jobType"
-                  labelFor="jobType"
-                  onChange={(e) => setJobTypeUpdate(e.target.value)}
-                />
-
-                <InputType
-                  id="location"
-                  name="location"
-                  placeholder="location"
-                  type="text"
-                  value={locationUpdate}
-                  required
-                  autoComplete="autocomplete"
-                  label="location"
-                  labelFor="location"
-                  onChange={(e) => setLocationUpdate(e.target.value)}
-                />
-                <div className="flex items-center justify-between space-x-4">
-                  <InputType
-                    type="date"
-                    value={startDateUpdate}
-                    onChange={(e) => setStartDateUpdate(e.target.value)}
-                    id="startDate"
-                    name="startDate"
-                    label="startDate"
-                    labelFor="startDate"
-                  />
-                  <p className="block text-sm font-medium leading-6 text-gray-900 pt-10">
-                    {startDateUpdate.slice(0, 10)}
-                  </p>
-                </div>
-
-                <div className="flex items-center justify-between space-x-4">
-                  <InputType
-                    type="date"
-                    value={endDateUpdate}
-                    onChange={(e) => setEndDateUpdate(e.target.value)}
-                    id="endDate"
-                    name="endDate"
-                    label="endDate"
-                    labelFor="endDate"
-                  />
-                  <p className="block text-sm font-medium leading-6 text-gray-900 pt-10">
-                    {endDateUpdate.slice(0, 10)}
-                  </p>
-                </div>
-
-                <div className="col-span-full">
-                  <label
-                    htmlFor="jobSummary"
-                    className="block text-sm font-medium leading-6 text-gray-900"
-                  >
-                    jobSummary
-                  </label>
-                  <div className="mt-2">
-                    <textarea
-                      id="jobSummary"
-                      name="jobSummary"
-                      rows={3}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                      value={jobSummaryUpdate}
-                      onChange={(e) => setJobSummaryUpdate(e.target.value)}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+              <form className="p-6 space-y-8" onSubmit={submitHandler}>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Basic Information
+                  </h3>
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <InputType
+                      id="name"
+                      name="name"
+                      placeholder="e.g., Senior Software Engineer"
+                      type="text"
+                      value={nameUpdate}
+                      required
+                      autoComplete="off"
+                      label="Job Title"
+                      labelFor="name"
+                      onChange={(e) => setNameUpdate(e.target.value)}
+                    />
+                    <InputType
+                      id="company"
+                      name="company"
+                      placeholder="e.g., Tech Solutions Inc."
+                      type="text"
+                      value={companyUpdate}
+                      required
+                      autoComplete="off"
+                      label="Company Name"
+                      labelFor="company"
+                      onChange={(e) => setCompanyUpdate(e.target.value)}
                     />
                   </div>
-                  <p className="mt-3 text-sm leading-6 text-gray-600">
-                    Write a few sentences about yourself.
-                  </p>
                 </div>
-
-                <div className="col-span-full">
-                  <label
-                    htmlFor="responsibities"
-                    className="block text-sm font-medium leading-6 text-gray-900"
-                  >
-                    responsibities
-                  </label>
-                  <div className="mt-2">
-                    <textarea
-                      id="responsibities"
-                      name="responsibities"
-                      rows={3}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                      value={responsibitiesUpdate}
-                      onChange={(e) => setResponsibitiesUpdate(e.target.value)}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Job Details
+                  </h3>
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <InputType
+                      id="pay"
+                      name="pay"
+                      placeholder="e.g., 8-12"
+                      type="text"
+                      value={payUpdate}
+                      required
+                      autoComplete="off"
+                      label="Salary Range (LPA)"
+                      labelFor="pay"
+                      onChange={(e) => setPayUpdate(e.target.value)}
+                    />
+                    <InputType
+                      id="experience"
+                      name="experience"
+                      placeholder="e.g., 3-5"
+                      type="text"
+                      value={experienceUpdate}
+                      required
+                      autoComplete="off"
+                      label="Required Experience (years)"
+                      labelFor="experience"
+                      onChange={(e) => setExperienceUpdate(e.target.value)}
+                    />
+                    <InputType
+                      id="jobType"
+                      name="jobType"
+                      placeholder="e.g., Full-time, Remote"
+                      type="text"
+                      value={jobTypeUpdate}
+                      required
+                      autoComplete="off"
+                      label="Employment Type"
+                      labelFor="jobType"
+                      onChange={(e) => setJobTypeUpdate(e.target.value)}
+                    />
+                    <InputType
+                      id="location"
+                      name="location"
+                      placeholder="e.g., New York, NY"
+                      type="text"
+                      value={locationUpdate}
+                      required
+                      autoComplete="off"
+                      label="Location"
+                      labelFor="location"
+                      onChange={(e) => setLocationUpdate(e.target.value)}
+                    />
+                    <InputType
+                      id="openings"
+                      name="openings"
+                      placeholder="e.g., 5"
+                      type="number"
+                      value={openingsUpdate}
+                      required
+                      autoComplete="off"
+                      label="Number of Positions"
+                      labelFor="openings"
+                      onChange={(e) =>
+                        setOpeningsUpdate(Number(e.target.value))
+                      }
+                    />
+                    <InputType
+                      id="status"
+                      name="status"
+                      placeholder="e.g., open/close"
+                      type="text"
+                      value={statusUpdate}
+                      required
+                      autoComplete="off"
+                      label="Job Status"
+                      labelFor="status"
+                      onChange={(e) => setStatusUpdate(e.target.value)}
                     />
                   </div>
-                  <p className="mt-3 text-sm leading-6 text-gray-600">
-                    Write a few sentences about yourself.
-                  </p>
                 </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Detailed Description
+                  </h3>
+                  <div className="space-y-6">
+                    <div>
+                      <label
+                        htmlFor="jobSummary"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
+                        Job Summary
+                      </label>
+                      <textarea
+                        id="jobSummary"
+                        name="jobSummary"
+                        rows={3}
+                        className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        value={jobSummaryUpdate}
+                        onChange={(e) => setJobSummaryUpdate(e.target.value)}
+                        placeholder="Provide a brief overview of the position..."
+                      />
+                    </div>
 
-                <div className="col-span-full">
-                  <label
-                    htmlFor="skils"
-                    className="block text-sm font-medium leading-6 text-gray-900"
-                  >
-                    skils
-                  </label>
-                  <div className="mt-2">
-                    <textarea
-                      id="skils"
-                      name="skils"
-                      rows={3}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                      value={skilsUpdate}
-                      onChange={(e) => setSkilsUpdate(e.target.value)}
-                    />
-                  </div>
-                  <p className="mt-3 text-sm leading-6 text-gray-600">
-                    Write a few sentences about yourself.
-                  </p>
-                </div>
+                    <div data-color-mode="light">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Responsibilities
+                      </label>
+                      <MDEditor
+                        value={responsibitiesUpdate}
+                        onChange={(value) =>
+                          setResponsibitiesUpdate(value || "")
+                        }
+                        preview="edit"
+                        className="min-h-[200px]"
+                      />
+                    </div>
 
-                <div className="col-span-full">
-                  <label
-                    htmlFor="eligbilty"
-                    className="block text-sm font-medium leading-6 text-gray-900"
-                  >
-                    eligbilty
-                  </label>
-                  <div className="mt-2">
-                    <textarea
-                      id="eligbilty"
-                      name="eligbilty"
-                      rows={3}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                      value={eligbiltyUpdate}
-                      onChange={(e) => setEligbiltyUpdate(e.target.value)}
-                    />
+                    <div>
+                      <label
+                        htmlFor="skils"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
+                        Required Skills
+                      </label>
+                      <textarea
+                        id="skils"
+                        name="skils"
+                        rows={3}
+                        className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        value={skilsUpdate}
+                        onChange={(e) => setSkilsUpdate(e.target.value)}
+                        placeholder="List the required skills and qualifications..."
+                      />
+                    </div>
                   </div>
-                  <p className="mt-3 text-sm leading-6 text-gray-600">
-                    Write a few sentences about yourself.
-                  </p>
                 </div>
 
                 <div>
                   <button
                     type="submit"
-                    className="flex w-full justify-center rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+                    className="w-full px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                   >
-                    Update
+                    Update Job Position
                   </button>
                 </div>
               </form>
             </div>
           </div>
-        </>
+        </div>
       )}
     </AdminLayout>
   );

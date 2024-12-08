@@ -1,4 +1,4 @@
-import { User } from "./types";
+import { FavoriteJob, User } from "./types";
 
 export interface UserReducerInitialState {
   user: User | null;
@@ -8,4 +8,8 @@ export interface UserReducerInitialState {
 export interface ResumeReducerInitialState {
   singleresume: string | null;
   loading: boolean;
+}
+
+export interface FavoriteState {
+  favoriteJobs: FavoriteJob[];
 }

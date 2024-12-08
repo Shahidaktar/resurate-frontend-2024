@@ -1,37 +1,38 @@
+import { PlusIcon } from "@heroicons/react/24/outline";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Skeleton1 } from "../../components/Loader";
 import AdminLayout from "../../components/shared/Layout/AdminLayout";
-import { useAllAppliesQuery } from "../../redux/api/ApplyAPI";
-import { useJobDetailsQuery } from "../../redux/api/jobAPI";
+import { useRecruiterJobsQuery } from "../../redux/api/jobAPI";
 import { RootState } from "../../redux/store";
 import { CustomError } from "../../types/api-types";
 
-const JobApplicants = () => {
+const Applicant = () => {
   const { user } = useSelector((state: RootState) => state.userReducer);
-  const params = useParams();
-  const { data, isLoading, isError, error } = useAllAppliesQuery({
-    adminId: user?._id!,
-    jobId: params.id!,
-  });
-  const { data: jobData } = useJobDetailsQuery(params.id!);
+  const { data, isLoading, isError, error } = useRecruiterJobsQuery(user?._id!);
 
   if (isError) {
     const err = error as CustomError;
     toast.error(err.data.message);
   }
+
   return (
     <AdminLayout>
       {isLoading ? (
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-          <Skeleton1 />
-        </div>
+        <Skeleton1 />
       ) : (
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-          <h1 className="text-2xl font-semibold text-gray-900 ">
-            Applications ({jobData?.data.name})
-          </h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-semibold text-gray-900">Jobs</h1>
+            <Link
+              to="/admin/job/new"
+              className="mt-4 inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0"
+            >
+              <PlusIcon className="-ml-1 mr-2 h-5 w-5" />
+              Add Job
+            </Link>
+          </div>
           <div className="mt-8 flex flex-col">
             <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
               <div className="inline-block min-w-full py-2 align-middle">
@@ -43,75 +44,70 @@ const JobApplicants = () => {
                           scope="col"
                           className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
                         >
-                          Applicant Name
-                        </th>
-                        <th
-                          scope="col"
-                          className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
-                        >
-                          Email
+                          Job Role
                         </th>
                         <th
                           scope="col"
                           className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                         >
-                          DOB
+                          Company
                         </th>
                         <th
                           scope="col"
                           className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                         >
-                          Score
+                          Pay
                         </th>
                         <th
                           scope="col"
                           className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                         >
-                          Manage
+                          Location
                         </th>
                         <th
                           scope="col"
                           className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                         >
-                          Status
+                          Action
+                        </th>
+                        <th
+                          scope="col"
+                          className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                        >
+                          Applicants
                         </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 bg-white">
                       {data?.data.map((record) => (
-                        <tr key={record.user._id} className="hover:bg-gray-50">
+                        <tr key={record.name} className="hover:bg-gray-50">
                           <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                            {record.user?.name}
-                          </td>
-                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                            {record.user.email}
+                            {record.name}
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {record.user.dob.slice(0, 10)}
+                            {record.company}
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {record.score}
+                            ₹{record.pay}
                           </td>
-                          <td className="whitespace-nowrap px-3 py-4">
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            {record.location}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm">
                             <Link
-                              to={`/admin/job/applications/status/${record._id}`}
+                              to={`/admin/job/${record._id}`}
                               className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-sm font-medium text-blue-700 hover:bg-blue-100"
                             >
                               Manage
                             </Link>
                           </td>
-                          <td className="whitespace-nowrap px-3 py-4 ">
-                            <span
-                              className={`px-2 py-1 text-sm font-medium rounded-md ${
-                                record.status === "Pending"
-                                  ? "bg-yellow-50 text-yellow-700 hover:bg-yellow-100"
-                                  : record.status === "Selected"
-                                  ? "bg-green-50 text-green-700 hover:bg-green-100"
-                                  : "bg-red-50 text-red-700 hover:bg-red-100"
-                              }`}
+                          <td className="whitespace-nowrap px-3 py-4 text-sm">
+                            <Link
+                              to={`/admin/job/applications/${record._id}`}
+                              className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 hover:bg-green-100"
                             >
-                              {record.status}
-                            </span>
+                              Applicants
+                            </Link>
                           </td>
                         </tr>
                       ))}
@@ -127,4 +123,4 @@ const JobApplicants = () => {
   );
 };
 
-export default JobApplicants;
+export default Applicant;

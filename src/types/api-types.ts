@@ -3,6 +3,7 @@ import {
   Job,
   JobData,
   NewApplyforAll,
+  Post,
   UpdateResume,
   User,
 } from "./types";
@@ -47,6 +48,7 @@ export type AllJobsResponse = {
 export type searchJobsResponse = {
   success: boolean;
   jobs: Job[];
+  allJobs: Job[];
   totalPage: number;
 };
 
@@ -63,7 +65,10 @@ export type searchJobsRequest = {
   search: string;
   location?: string;
   jobType?: string;
-  page: string;
+  experience?: string;
+  status?: string;
+  pay?: string;
+  page: number;
 };
 
 export type NewJobRequest = {
@@ -120,4 +125,14 @@ export type AllApplyResponse = {
 export type DeleteUserRequest = {
   userId: string;
   adminUserId: string;
+};
+
+export type PostResponse = {
+  success: boolean;
+  posts: Post[];
+};
+
+export type NewPostResponse = {
+  success: boolean;
+  message: string;
 };

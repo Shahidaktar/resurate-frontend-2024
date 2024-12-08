@@ -65,11 +65,13 @@ const UploadResume = () => {
               Your Profile
             </h2>
           </div>
+
           <img
-            src={`${user?.photo}`}
+            src={user?.photo}
+            alt="Profile"
             height={150}
             width={150}
-            className="mx-auto rounded-full mt-4"
+            className="mx-auto rounded-full mt-4 text-center border-2 border-gray-200"
           />
           <div className="mt-4 sm:mx-auto sm:w-full sm:max-w-sm space-y-6">
             <div className="flex flex-col items-start space-y-2">

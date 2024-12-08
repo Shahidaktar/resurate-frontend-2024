@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import axios from "axios";
 import {
   AllApplyRequest,
   AllApplyResponse,
@@ -7,7 +8,6 @@ import {
   MessageResponse,
   MsgResponse,
 } from "../../types/api-types";
-import axios from "axios";
 
 export const applyAPI = createApi({
   reducerPath: "applyApi",
@@ -24,7 +24,7 @@ export const applyAPI = createApi({
       query: (id) => `my?id=${id}`,
       providesTags: ["apply"],
     }),
-    existingApply: builder.query<ApplyResponse, any>({
+    existingApply: builder.query<{ success: boolean; status: boolean }, any>({
       query: ({ user, job }) => `existing/${job}?user=${user}`,
       keepUnusedDataFor: 0,
     }),

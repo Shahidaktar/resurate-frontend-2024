@@ -140,7 +140,7 @@ const ManageJob = () => {
 
               <button
                 onClick={deleteHandler}
-                className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-sm font-medium text-red-700 "
+                className="inline-flex items-center rounded-md px-2 py-1 text-sm font-medium text-red-700 "
               >
                 <TrashIcon className="mr-1.5 h-4 w-4" />
                 Delete
@@ -302,7 +302,7 @@ const ManageJob = () => {
                         htmlFor="skils"
                         className="block text-sm font-medium text-gray-700 mb-2"
                       >
-                        Required Skills
+                        Required Skills (Comma Separated)
                       </label>
                       <textarea
                         id="skils"

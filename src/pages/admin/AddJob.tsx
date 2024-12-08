@@ -225,7 +225,7 @@ const AddJob = () => {
                       htmlFor="skils"
                       className="block text-sm font-medium text-gray-700 mb-2"
                     >
-                      Required Skills
+                      Required Skills (Comma Separated)
                     </label>
                     <textarea
                       id="skils"
